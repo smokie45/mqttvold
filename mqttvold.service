@@ -1,8 +1,8 @@
 [Unit]
 Description="MQTT volume control daemon"
 # Note: only needed if broker is local
-Requires=mosquitto.service
-After=mosquitto.service
+#Requires=mosquitto.service
+#After=mosquitto.service
 
 [Service]
 ExecStart=/usr/local/bin/mqttvold.py
