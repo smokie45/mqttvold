@@ -74,6 +74,9 @@ def on_connect(client, userdata, flags, rc):
     if rc == 0:
         log.info("connected to mqtt server")
         client.isConnected = True
+        for topic in MQTT_TOPICS:
+            log.debug(f"subscribing to mqtt topic: {topic}")
+            client.subscribe( topic, 0 )
     else:
         log.error("on_connect: failed to connect to mqtt server")
 
@@ -136,22 +139,12 @@ mqttC.isConnected = False
 mqttC.on_connect = on_connect
 mqttC.on_message = on_mqtt
 mqttC.on_subscribe = on_subscribe
-mqttC.on_log = on_log
-mqttC.loop_start()        # create rx/tx thread in background
-try:
-    mqttC.connect( MQTT_SERVER, MQTT_PORT, 10)
-except:
-    log.error("Failed to connect to mqtt server. Retry in 2 secs ....")
-while not mqttC.isConnected:
-        time.sleep(1)           # wait till mqtt server arrives.
-
-for topic in MQTT_TOPICS:
-    log.debug(f"subscribing to mqtt topic: {topic}")
-    mqttC.subscribe( topic, 0 )
+#mqttC.on_log = on_log
+mqttC.connect( MQTT_SERVER, MQTT_PORT, 10)
 
 try:
-    # TODO: wait till termination
-    time.sleep(1000)
+    # this is a blocking call !
+    mqttC.loop_forever()
 except KeyboardInterrupt:
     mqttC.loop_stop()
     mqttC.disconnect()
