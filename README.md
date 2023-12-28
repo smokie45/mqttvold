@@ -5,7 +5,12 @@ It is implemented in python and utilizes [Paho MQTT](https://eclipse.dev/paho/in
 
 I'm using it to control the volume of my headless RPI by using a [Tuya Zigbee smart knob](https://www.zigbee2mqtt.io/devices/ERS-10TZBVK-AA.html) propagated via [zigbee2mqtt](https://www.zigbee2mqtt.io/).
 
-# Todo:
+Usage:
+  - edit mqttvold.py to add your MQTT broker and the topics where the Smart knob events are
+  - switch the smar knob to "event mode".
+  - run the deamon on the machine having pulse audio.
+
+Todo:
 - refactor (e.g. remove global variables)
 - use systemd dynamic user
 - pause spotify
