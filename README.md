@@ -10,7 +10,7 @@ Usage:
   - switch the smar knob to "event mode".
   - run the deamon on the machine having pulse audio.
 
-# Todo:
+Todo:
 - refactor (e.g. remove global variables)
 - use systemd dynamic user
 - pause spotify
