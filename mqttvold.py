@@ -53,7 +53,7 @@ class Volume:
             newVolume = self.volume
             self.mute= False
         else:
-            mute = True
+            self.mute = True
 
         log.debug(f"toggle mute. Set volume to {newVolume}")
         # call pulse audio to adjust mute/unmute
