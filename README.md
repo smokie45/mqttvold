@@ -11,6 +11,5 @@ Usage:
   - run the deamon on the machine having pulse audio.
 
 Todo:
-- refactor (e.g. remove global variables)
 - use systemd dynamic user
 - pause spotify
