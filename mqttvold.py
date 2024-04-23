@@ -21,7 +21,7 @@ import subprocess
 
 MQTT_SERVER = "192.168.0.90"
 MQTT_PORT   = 1883
-MQTT_TOPICS = [ 'z2m_DG/buero_rotary' ]
+MQTT_TOPICS = [ 'z2m/DG_Buero_Rotary' ]
 
 class Volume:
     """Class to handle the pulse audio volume adjusts"""
@@ -71,12 +71,13 @@ def on_message( client, userdata, msg ):
     # convert the received JSON payload into a python object
     o = json.loads( msg.payload, object_hook=lambda d: SimpleNamespace(**d))
     action = o.action
-    step = o.action_step_size
     vol = userdata
     match action:
         case 'brightness_step_down':
+            step = o.action_step_size
             vol.adjust( step*-1 )
         case 'brightness_step_up':
+            step = o.action_step_size
             vol.adjust( step )
         case 'toggle':
             vol.toggleMute()
