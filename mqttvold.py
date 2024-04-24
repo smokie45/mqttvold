@@ -18,9 +18,11 @@ import argparse
 import json
 from types import SimpleNamespace
 import subprocess
+import time
 
 MQTT_SERVER = "192.168.0.90"
 MQTT_PORT   = 1883
+MQTT_RETRY_S = 60
 MQTT_TOPICS = [ 'z2m/DG_Buero_Rotary' ]
 
 class Volume:
@@ -165,7 +167,12 @@ if __name__ == "__main__":
     mqttC.on_message = on_message
     mqttC.on_subscribe = on_subscribe
     mqttC.on_log = on_log
-    mqttC.connect( MQTT_SERVER, MQTT_PORT, 10)
+    while not mqttC.is_connected():
+        try:
+            mqttC.connect( MQTT_SERVER, MQTT_PORT, 10)
+        except:
+            log.error(f"Failed to connect to {MQTT_SERVER}:{MQTT_PORT}.Retry in {MQTT_RETRY_S}s")
+            time.sleep(MQTT_RETRY_S)
 
     try:
         # this is a blocking call !
