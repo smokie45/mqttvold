@@ -167,9 +167,15 @@ if __name__ == "__main__":
     mqttC.on_message = on_message
     mqttC.on_subscribe = on_subscribe
     mqttC.on_log = on_log
-    while not mqttC.is_connected():
+    doRetry = True
+    while doRetry:
         try:
-            mqttC.connect( MQTT_SERVER, MQTT_PORT, 10)
+            err=mqttC.connect( MQTT_SERVER, MQTT_PORT, 10)
+            if err != 0:
+                log.error(f"Failed to connect to {MQTT_SERVER}:{MQTT_PORT}.Retry in {MQTT_RETRY_S}s. [err={err}]")
+                time.sleep(MQTT_RETRY_S)
+            else:
+                doRetry = False
         except:
             log.error(f"Failed to connect to {MQTT_SERVER}:{MQTT_PORT}.Retry in {MQTT_RETRY_S}s")
             time.sleep(MQTT_RETRY_S)
