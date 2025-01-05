@@ -29,6 +29,28 @@ class Volume:
     """Class to handle the pulse audio volume adjusts"""
     volume = 80
     mute   = False
+    init = False
+
+    def doInit( self ):
+        if self.init:
+            return True
+        # fetch current volume and mute state
+        ret = subprocess.run( ["/usr/bin/wpctl", "get-volume", "@DEFAULT_SINK@" ], capture_output=True )
+        tmp =  ret.stdout.decode('utf-8').split()
+        if len(tmp) == 0:
+            return False
+        self.volume = int(float(tmp[1])*100)
+        if len(tmp) > 2:
+            if tmp[2] == "[MUTED]":
+                self.mute = True
+        log.debug(f"Volume is at {self.volume}% and mute={self.mute}")
+        self.init = True
+        return True
+
+
+    def __init__(self):
+        self.doInit()
+
 
     def adjust( self, step: int):
         """
@@ -36,6 +58,8 @@ class Volume:
         Args:
             step: a pos- or negative integer to adjust the volume
         """
+        if not self.doInit():
+            return
 
         self.volume += int(step/2)
         if self.volume > 100:
@@ -46,20 +70,26 @@ class Volume:
 
         log.debug(f"adjust volume by {step} to {self.volume}")
         # call pulse audio to adjust volume
-        self._exec( ["/usr/bin/pactl", "set-sink-volume", "0", f"{self.volume}%"] )
+        #self._exec( ["/usr/bin/pactl", "set-sink-volume", "0", f"{self.volume}%"] )
+        self._exec( ["/usr/bin/wpctl", "set-volume", "@DEFAULT_SINK@", f"{self.volume}%"] )
 
     def toggleMute(self):
         """Toggles mute by toggling volume to 0 and back"""
-        newVolume = 0
+        #newVolume = 0
+        if not self.doInit():
+            return
         if self.mute:
-            newVolume = self.volume
             self.mute= False
+            self._exec( ["/usr/bin/wpctl", "set-mute", "@DEFAULT_SINK@", "0"] )
+            #    newVolume = self.volume
         else:
             self.mute = True
+            self._exec( ["/usr/bin/wpctl", "set-mute", "@DEFAULT_SINK@", "1"] )
 
-        log.debug(f"toggle mute. Set volume to {newVolume}")
+        #log.debug(f"toggle mute. Set volume to {newVolume}")
         # call pulse audio to adjust mute/unmute
-        self._exec( ["/usr/bin/pactl", "set-sink-volume", "0", f"{newVolume}%"] )
+        #self._exec( ["/usr/bin/pactl", "set-sink-volume", "0", f"{newVolume}%"] )
+        #self._exec( ["/usr/bin/wpctl", "set-volume", "@DEFAULT_SINK@", f"{self.volume}%"] )
 
     def _exec(self, cmd ):
         """Execute a cmd on host"""
