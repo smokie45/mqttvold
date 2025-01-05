@@ -8,4 +8,4 @@ Description="MQTT volume control daemon"
 ExecStart=/usr/local/bin/mqttvold.py
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
