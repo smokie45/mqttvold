@@ -102,9 +102,12 @@ def on_message( client, userdata, msg ):
     log.debug("on_mqtt: '"+msg.topic+"' -> '" + str(msg.payload) +"'")
     # convert the received JSON payload into a python object
     o = json.loads( msg.payload, object_hook=lambda d: SimpleNamespace(**d))
-    action = o.action
+    if not hasattr(o, 'action'):
+        # sometimes action is not included.
+        log.error("No 'action' property in received mqtt message. Ignoring!")
+        return
     vol = userdata
-    match action:
+    match o.action:
         case 'brightness_step_down':
             step = o.action_step_size
             vol.adjust( step*-1 )
